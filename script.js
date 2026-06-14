@@ -118,3 +118,15 @@ function resetSave() {
 
     location.reload();
 }
+function showHome() {
+
+    document.getElementById("content").innerHTML = `
+        <h2>欢迎回来，观测员 ${save.employeeId}</h2>
+
+        <p>当前工作日：Day ${save.day}</p>
+
+        <p>待处理档案：1</p>
+
+        <p>未读邮件：${save.mailRead ? 0 : 1}</p>
+    `;
+}
