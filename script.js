@@ -191,3 +191,14 @@ async function openForum() {
 
     document.getElementById("content").innerHTML = html;
 }
+function openLog() {
+
+    document.getElementById("content").innerHTML = `
+        <h2>系统日志</h2>
+
+        <p>
+        E-023：
+        ${save.systemLog || "无记录"}
+        </p>
+    `;
+}
