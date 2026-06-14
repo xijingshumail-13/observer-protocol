@@ -90,9 +90,9 @@ async function openArchive() {
 
 function choose(choice) {
 
-    save["E-023"] = choice;
-
+    save.realChoice = choice;
     save.day = 2;
+    save.systemLog = "删除";
 
     persist();
 
