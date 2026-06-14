@@ -45,6 +45,7 @@ function enterDesktop() {
         欢迎回来，观测员 ${save.employeeId}。<br><br>
         当前工作日：Day ${save.day}
         `;
+    showHome();
 }
 
 function persist() {
