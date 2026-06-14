@@ -131,3 +131,63 @@ function showHome() {
         <p>未读邮件：${save.mailRead ? 0 : 1}</p>
     `;
 }
+async function openMail() {
+
+    const response = await fetch("data/mails.json");
+
+    const mails = await response.json();
+
+    const available = mails.filter(
+        m => m.day <= save.day
+    );
+
+    let html = "<h2>邮件</h2>";
+
+    available.forEach(mail => {
+
+        html += `
+            <div class="mail">
+                <h3>${mail.title}</h3>
+
+                <p>发件人：${mail.from}</p>
+
+                <p>${mail.content}</p>
+
+                <hr>
+            </div>
+        `;
+    });
+
+    save.mailRead = true;
+
+    persist();
+
+    document.getElementById("content").innerHTML = html;
+}
+async function openForum() {
+
+    const response = await fetch("data/forum.json");
+
+    const posts = await response.json();
+
+    const available = posts.filter(
+        p => p.day <= save.day
+    );
+
+    let html = "<h2>员工论坛</h2>";
+
+    available.forEach(post => {
+
+        html += `
+            <div class="post">
+                <strong>${post.author}</strong>
+
+                <p>${post.content}</p>
+
+                <hr>
+            </div>
+        `;
+    });
+
+    document.getElementById("content").innerHTML = html;
+}
