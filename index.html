@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>BIS 内网</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="login-screen">
+    <div class="window">
+        <h1>信息稳定局（BIS）</h1>
+
+        <p>内部办公系统 v7.3</p>
+
+        <p>请输入员工编号：</p>
+
+        <input id="employee-id" placeholder="例如：0729">
+
+        <button onclick="login()">
+            登录
+        </button>
+
+        <p class="warning">
+            未经授权访问将被记录。
+        </p>
+    </div>
+</div>
+
+<div id="desktop" class="hidden">
+
+    <header>
+        BIS 内网 v7.3
+    </header>
+
+    <main>
+
+        <div class="sidebar">
+            <button onclick="openArchive()">
+                今日档案
+            </button>
+
+            <button onclick="resetSave()">
+                删除存档
+            </button>
+        </div>
+
+        <div id="content">
+            欢迎回来，观测员。
+        </div>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
