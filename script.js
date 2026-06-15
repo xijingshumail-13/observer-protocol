@@ -21,6 +21,8 @@ function initializeSave() {
     save.logs = save.logs || [];
     save.forumReplies = save.forumReplies || [];
     save.flags = save.flags || {};
+    save.flags = save.flags || {};
+    save.realChoices = save.realChoices || {};
 }
 
 function replyLinLan() {
@@ -226,6 +228,11 @@ function choose(eventId, choice) {
 
         recordedChoice: "删除"
     });
+    save.realChoices[eventId] = choice;
+
+    if (eventId === "E-031") {
+        save.flags.day6Choice = choice;
+    }
 
     persist();
 
@@ -343,6 +350,20 @@ async function openForum() {
 
             <button onclick="denyFakePost()">
                 回复：“这不是我发的。”
+            </button>
+        `;
+    }
+    if (
+        save.day === 6 &&
+        save.flags.deniedFakePost &&
+        !save.flags.questionedLinLan
+    ) {
+
+        html += `
+            <hr>
+
+            <button onclick="questionLinLan()">
+                回复：“你是谁？”
             </button>
         `;
     }
@@ -488,4 +509,36 @@ async function endDay() {
             返回首页
         </button>
     `;
+}
+function resetSave() {
+
+    if (!confirm(
+        "警告：执行记忆清除后，所有观测记录将永久丢失。\n\n确认继续？"
+    )) {
+        return;
+    }
+    if (
+        save.flags.deniedFakePost &&
+        confirm("检测到异常记忆残留，是否执行深度清除？")
+    )
+
+    localStorage.removeItem("observer_save");
+
+    alert("记忆清除完成。");
+
+    location.reload();
+}
+function questionLinLan() {
+
+    save.flags.questionedLinLan = true;
+
+    save.forumReplies.push({
+        day: save.day,
+        author: save.employeeId,
+        content: "你是谁？"
+    });
+
+    persist();
+
+    openForum();
 }

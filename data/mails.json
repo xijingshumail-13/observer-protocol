@@ -40,5 +40,19 @@
         "title": "Re: 别再调查了",
         "from": "lin.lan@bis.local",
         "content": "我相信你。因为我收到过和你一模一样的帖子。"
+    },
+    {
+        "day": 6,
+        "condition": "deniedFakePost",
+        "from": "身份认证中心",
+        "title": "验证失败通知",
+        "content": "系统检测到存在另一名员工使用相同编号。\n\n如非本人操作，请忽略本邮件。"
+    },
+    {
+        "day": 6,
+        "condition": "deniedFakePost",
+        "from": "身份认证中心",
+        "title": "验证成功通知",
+        "content": "您的身份验证已通过。"
     }
 ]
