@@ -21,14 +21,22 @@ function initializeSave() {
     save.logs = save.logs || [];
     save.repliedToLinLan =
         save.repliedToLinLan || false;
+    save.forumReplies = save.forumReplies || [];
 }
 
 function replyLinLan() {
 
     save.repliedToLinLan = true;
 
+    save.forumReplies.push({
+        day: save.day,
+        author: save.employeeId,
+        content: "收到"
+    });
+
     persist();
 
+    openForum();
     document.getElementById("content").innerHTML += `
         <p><em>你的回复已发送。</em></p>
     `;
@@ -247,10 +255,19 @@ async function openForum() {
     const response = await fetch("data/forum.json");
     const posts = await response.json();
 
-    const available = posts.filter(post =>
-        post.day <= save.day
+    const systemPosts = posts.filter(
+        post => post.day <= save.day
     );
 
+    const playerPosts = save.forumReplies.filter(
+        post => post.day <= save.day
+    );
+
+    const available = [
+        ...systemPosts,
+        ...playerPosts
+    ];
+    available.sort((a, b) => a.day - b.day);
     let html = "<h2>员工论坛</h2>";
 
     if (available.length === 0) {
