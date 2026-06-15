@@ -332,7 +332,6 @@ async function openForum() {
             </button>
         `;
     }
-    document.getElementById("content").innerHTML = html;
     if (
         save.day === 5 &&
         save.flags.repliedLinLan &&
@@ -347,6 +346,7 @@ async function openForum() {
             </button>
         `;
     }
+    document.getElementById("content").innerHTML = html;
 }
 
 function denyFakePost() {
