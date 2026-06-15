@@ -23,6 +23,7 @@ function initializeSave() {
     save.flags = save.flags || {};
     save.flags = save.flags || {};
     save.realChoices = save.realChoices || {};
+    save.chapterFinished = save.chapterFinished || false;
 }
 
 function replyLinLan() {
@@ -117,6 +118,10 @@ function checkCondition(condition) {
 async function showHome() {
 
     initializeSave();
+    if (save.chapterFinished) {
+        showEnding();
+        return;
+    }
 
     const eventResponse = await fetch("data/events.json");
     const events = await eventResponse.json();
@@ -166,6 +171,10 @@ async function showHome() {
 async function openArchive() {
 
     initializeSave();
+    if (save.chapterFinished) {
+        showEnding();
+        return;
+    }
 
     const response = await fetch("data/events.json");
     const events = await response.json();
@@ -429,6 +438,10 @@ function openLog() {
 async function endDay() {
 
     initializeSave();
+    if (save.chapterFinished) {
+        showEnding();
+        return;
+    }
 
     const response = await fetch("data/events.json");
     const events = await response.json();
@@ -512,15 +525,18 @@ async function endDay() {
         return;
     }
 
-        if (
-            save.day === 9 &&
-            save.flags.finalChoice
-        ) {
+    if (
+        save.day === 9 &&
+        save.flags.finalChoice
+    ) {
 
-            showEnding();
+        save.chapterFinished = true;
+        persist();
 
-            return;
-        }
+        showEnding();
+
+        return;
+    }
 
     /* 普通结算 */
     document.getElementById("content").innerHTML = `
