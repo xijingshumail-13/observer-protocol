@@ -22,11 +22,11 @@ function initializeSave() {
     save.repliedToLinLan =
         save.repliedToLinLan || false;
     save.forumReplies = save.forumReplies || [];
+    save.flags = save.flags || {};
 }
 
 function replyLinLan() {
-
-    save.repliedToLinLan = true;
+    save.flags.repliedLinLan = true;
 
     save.forumReplies.push({
         day: save.day,
@@ -37,9 +37,6 @@ function replyLinLan() {
     persist();
 
     openForum();
-    document.getElementById("content").innerHTML += `
-        <p><em>你的回复已发送。</em></p>
-    `;
 }
 
 function login() {

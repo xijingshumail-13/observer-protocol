@@ -18,15 +18,17 @@
     "content": "近期论坛存在显示异常，请勿传播未经证实的信息。"
     },
     {
-        "day": 3,
-        "title": "Re: 红色通知",
-        "from": "lin.lan@bis.local",
-        "content": "别在邮件里回复我。如果你也发现日志有问题，请去论坛找我。"
-    },
-    {
         "day": 4,
+        "condition": "repliedLinLan",
         "title": "Re: 收到",
         "from": "lin.lan@bis.local",
         "content": "原来真的还有别人能看见。谢谢你回复我。"
+    },
+    {
+        "day": 4,
+        "condition": "!repliedLinLan",
+        "title": "系统维护补充说明",
+        "from": "BIS技术中心",
+        "content": "近期请勿在论坛讨论日志异常。不存在异常。"
     }
 ]

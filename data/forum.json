@@ -31,7 +31,26 @@
     },
     {
         "day": 4,
+        "condition": "repliedLinLan",
         "author": "林岚",
-        "content": "${save.employeeId}，你还在吗？"
+        "content": "昨天回复我的人，你还在吗？"
+    },
+    {
+    "day": 4,
+    "condition": "!repliedLinLan",
+    "author": "匿名",
+    "content": "昨天那个帖子是不是有人回复过？"
+    },
+    {
+        "day": 4,
+        "condition": "!repliedLinLan",
+        "author": "匿名",
+        "content": "我记得看到一个“收到”。"
+    },
+    {
+        "day": 4,
+        "condition": "!repliedLinLan",
+        "author": "匿名",
+        "content": "……还是我记错了？"
     }
 ]
