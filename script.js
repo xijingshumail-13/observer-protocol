@@ -4,16 +4,16 @@ window.onload = () => {
 
     const stored = localStorage.getItem("observer_save");
 
-    if (stored) 
-    {
+    if (stored) {
+
         save = JSON.parse(stored);
+
+        save.completedArchives = save.completedArchives || [];
+        save.readMails = save.readMails || [];
+        save.logs = save.logs || [];
+
+        enterDesktop();
     }
-
-    save.completedArchives = save.completedArchives || [];
-    save.readMails = save.readMails || [];
-    save.logs = save.logs || [];
-
-    showHome();
 };
 
 function login() {
@@ -110,16 +110,25 @@ async function openArchive() {
 function choose(eventId, choice) {
 
     save.realChoice = choice;
-    save.completedArchives.push(eventId);
-    save.logs.push({
-        eventId: eventId,
-        actualChoice: choice,
-        recordedChoice: "删除"
-    });
-    if (save.day === 1) {
-        save.day = 2;
+
+    if (!save.completedArchives.includes(eventId)) {
+
+        save.completedArchives.push(eventId);
+
     }
+
+    save.logs.push({
+
+        eventId: eventId,
+
+        actualChoice: choice,
+
+        recordedChoice: "删除"
+
+    });
+
     persist();
+
     openArchive();
 }
 
@@ -133,16 +142,24 @@ function resetSave() {
 
     location.reload();
 }
-function showHome() {
 
-    fetch("data/events.json")
-    .then(r => r.json())
-    .then(events => {
+async function showHome() {
 
-        const count = events.filter(event =>
-            event.day <= save.day &&
-            !save.completedArchives.includes(event.id)
-        ).length;
+    const eventResponse = await fetch("data/events.json");
+    const events = await eventResponse.json();
+
+    const mailResponse = await fetch("data/mails.json");
+    const mails = await mailResponse.json();
+
+    const count = events.filter(event =>
+        event.day <= save.day &&
+        !save.completedArchives.includes(event.id)
+    ).length;
+
+    const unread = mails.filter(mail =>
+        mail.day <= save.day &&
+        !save.readMails.includes(mail.title)
+    ).length;
 
     document.getElementById("content").innerHTML = `
         <h2>欢迎回来，观测员 ${save.employeeId}</h2>
@@ -151,19 +168,22 @@ function showHome() {
 
         <p>待处理档案：${count}</p>
 
-        const unread = mails.filter(mail =>
-        mail.day <= save.day &&
-        !(save.readMails || []).includes(mail.title)
-        ).length;
-        ${count === 0 ? `
-        <hr>
-        <button onclick="endDay()">
-        结束工作日
-        </button>
-        ` : ""}
+        <p>未读邮件：${unread}</p>
+
+        ${
+            count === 0
+            ? `
+            <hr>
+
+            <button onclick="endDay()">
+                结束工作日
+            </button>
+            `
+            : ""
+        }
     `;
-});
 }
+
 async function openMail() {
 
     const response = await fetch("data/mails.json");
@@ -198,6 +218,7 @@ async function openMail() {
 
     document.getElementById("content").innerHTML = html;
 }
+
 async function openForum() {
 
     const response = await fetch("data/forum.json");
@@ -225,6 +246,7 @@ async function openForum() {
 
     document.getElementById("content").innerHTML = html;
 }
+
 function openLog() {
 
     let html = "<h2>系统日志</h2>";
