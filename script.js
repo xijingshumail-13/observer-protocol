@@ -560,6 +560,9 @@ async function endDay() {
 
         return;
     }
+    if (save.day >= 9 && !save.endingState) {
+        save.endingState = "未确认";
+    }
 
     /* 普通结算 */
     document.getElementById("content").innerHTML = `
@@ -574,9 +577,6 @@ async function endDay() {
             返回首页
         </button>
     `;
-    if (save.day >= 9 && !save.endingState) {
-        save.endingState = "未确认";
-    }
 }
 function resetSave() {
 
@@ -612,49 +612,62 @@ function questionLinLan() {
 }
 function showEnding() {
 
-    let ending = "";
+    let title = "";
+    let text = "";
 
-    // 1. 认同系统版本
-    if (save.endingState === "批准删除") {
+    const s = save;
 
-        ending = {
-            title: "END 01：稳定协议",
-            text: "系统已恢复。\n你完成了所有删除操作。"
-        };
+    // F 优先级最高（身份错误）
+    if (s.flags.identityChecked && s.flags.identityValid === false) {
+
+        title = "END F：非授权观测体";
+        text = "身份验证失败。\n系统已停止响应你。";
     }
 
-    // 2. 反抗系统版本
-    else if (save.endingState === "拒绝删除") {
+    // C：伪造信息冲突
+    else if (s.flags.deniedFakePost) {
 
-        ending = {
-            title: "END 02：观测者残留",
-            text: "你拒绝了删除。\n系统开始重新标记你。"
-        };
+        title = "END C：身份冲突";
+        text = "你的记录与系统不一致。\n你被标记为异常源。";
     }
 
-    // 3. 上报异常（循环结局）
-    else if (save.endingState === "上报异常") {
+    // D：主动上报异常
+    else if (s.endingState === "上报异常") {
 
-        ending = {
-            title: "END 03：循环协议",
-            text: "上级正在接管。\n你回到了Day 1。"
-        };
+        title = "END D：循环协议";
+        text = "异常已上报。\n系统重置开始。";
     }
 
-    // 4. 没有选择（关键补丁）
+    // B：林岚路径
+    else if (s.flags.repliedLinLan) {
+
+        title = "END B：信息污染";
+        text = "你参与了未授权通信。\n记录已扩散。";
+    }
+
+    // A：纯工作流（你说的“只处理档案”）
+    else if (
+        !s.flags.repliedLinLan &&
+        !s.flags.deniedFakePost &&
+        !s.endingState
+    ) {
+
+        title = "END A：标准观测员";
+        text = "你完成了所有档案处理。\n未发生异常记录。";
+    }
+
+    // E：你缺失的“什么都没选”
     else {
 
-        ending = {
-            title: "END 00：未确认",
-            text: "你没有做出最终判断。\n系统无法解析你的状态。"
-        };
+        title = "END E：未观测状态";
+        text = "你没有留下任何可解析决策。\n系统无法确认你的存在。";
     }
 
     document.getElementById("content").innerHTML = `
-        <h2>${ending.title}</h2>
+        <h2>${title}</h2>
 
         <p style="white-space: pre-line;">
-            ${ending.text}
+            ${text}
         </p>
 
         <hr>
