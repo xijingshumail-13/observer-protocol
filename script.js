@@ -337,22 +337,22 @@ async function openForum() {
     if (
         save.day === 5 &&
         save.flags.repliedLinLan &&
-        !save.flags.deniedFakePost
-    ) {
-
-        html += `
-            <hr>
-
-            <button onclick="denyFakePost()">
-                回复：“这不是我发的。”
-            </button>
-        `;
-    }
+        !save.flags.deniedFakePost &&
+        available.some(post =>
+            renderText(post.author) === save.employeeId &&
+            post.content.includes("别再调查")
+        )
+    )
     document.getElementById("content").innerHTML = html;
+    console.log(
+        "论坛状态：",
+        save.day,
+        save.flags
+    );
 }
 
 function denyFakePost() {
-
+    console.log("触发 denyFakePost");
     save.flags.deniedFakePost = true;
 
     save.forumReplies.push({
@@ -434,6 +434,11 @@ async function endDay() {
     console.log("推进后Day:", save.day);
 
     /* Day5结束进入Day6时的特殊结算 */
+    console.log(
+        "Day6检查：",
+        save.day,
+        save.flags.deniedFakePost
+    );
     if (
         save.day === 6 &&
         save.flags.deniedFakePost
