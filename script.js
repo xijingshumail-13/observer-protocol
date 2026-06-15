@@ -11,7 +11,7 @@ window.onload = () => {
 
     save.completedArchives = save.completedArchives || [];
 
-    showHome();
+    enterDesktop();
 };
 
 function login() {
