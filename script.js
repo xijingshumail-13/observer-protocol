@@ -61,9 +61,7 @@ function persist() {
 }
 
 async function openArchive() {
-    console.log("当前日期", save.day);
-    console.log("已完成档案", save.completedArchives);
-    console.log("可用档案", available);
+    
     const response = await fetch("data/events.json");
 
     const events = await response.json();
@@ -104,6 +102,9 @@ async function openArchive() {
     });
 
     document.getElementById("content").innerHTML = html;
+    console.log("当前日期", save.day);
+    console.log("已完成档案", save.completedArchives);
+    console.log("可用档案", available);
 }
 
 function choose(eventId, choice) {
