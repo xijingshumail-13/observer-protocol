@@ -145,16 +145,20 @@ async function showHome() {
 
         <p>未读邮件：${unreadCount}</p>
 
+        <hr>
+
         ${
             archiveCount === 0
             ? `
-            <hr>
-
-            <button onclick="endDay()">
-                结束工作日
-            </button>
+                <button onclick="endDay()">
+                    结束工作日
+                </button>
             `
-            : ""
+            : `
+                <p style="color:#aa0000;">
+                    尚有未处理档案，无法提交工作日志。
+                </p>
+            `
         }
     `;
 }
@@ -358,32 +362,33 @@ function openLog() {
     document.getElementById("content").innerHTML = html;
 }
 
-function endDay() {
+async function endDay() {
+    const response = await fetch("data/events.json");
+        const events = await response.json();
 
-    save.day++;
+        const remaining = events.filter(event =>
+            event.day <= save.day &&
+            !save.completedArchives.includes(event.id) &&
+            checkCondition(event.condition)
+        );
 
-    persist();
+        if (remaining.length > 0) {
 
-    if (
-        save.day === 4 &&
-        save.flags.repliedLinLan
-    ) {
+            document.getElementById("content").innerHTML = `
+                <h2>系统提示</h2>
 
-        document.getElementById("content").innerHTML = `
-            <h2>系统同步中……</h2>
+                <p>
+                    尚有 ${remaining.length} 份档案待处理。<br><br>
+                    请完成全部工作后再提交日志。
+                </p>
 
-            <p>
-                检测到未授权信息交换。<br><br>
-                请勿讨论不存在的信息。
-            </p>
+                <button onclick="openArchive()">
+                    前往处理
+                </button>
+            `;
 
-            <button onclick="showHome()">
-                返回首页
-            </button>
-        `;
-
-        return;
-    }
+            return;
+        }
 
     document.getElementById("content").innerHTML = `
         <h2>系统同步中……</h2>

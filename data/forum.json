@@ -52,5 +52,29 @@
         "condition":"!repliedLinLan",
         "author":"匿名",
         "content":"……还是我记错了？"
+    },
+    {
+        "day": 5,
+        "condition": "repliedLinLan",
+        "author": "{employeeId}",
+        "content": "别再调查了。"
+    },
+    {
+        "day": 5,
+        "condition": "repliedLinLan",
+        "author": "林岚",
+        "content": "……这不是你发的，对吧？"
+    },
+    {
+        "day": 5,
+        "condition": "!repliedLinLan",
+        "author": "{employeeId}",
+        "content": "收到。"
+    },
+    {
+        "day": 5,
+        "condition": "!repliedLinLan",
+        "author": "林岚",
+        "content": "原来还有别人能看见。"
     }
 ]
