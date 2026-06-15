@@ -19,6 +19,19 @@ function initializeSave() {
     save.completedArchives = save.completedArchives || [];
     save.readMails = save.readMails || [];
     save.logs = save.logs || [];
+    save.repliedToLinLan =
+        save.repliedToLinLan || false;
+}
+
+function replyLinLan() {
+
+    save.repliedToLinLan = true;
+
+    persist();
+
+    document.getElementById("content").innerHTML += `
+        <p><em>你的回复已发送。</em></p>
+    `;
 }
 
 function login() {
@@ -261,7 +274,16 @@ async function openForum() {
             `;
         });
     }
+    if (save.day >= 3 && !save.repliedToLinLan) {
 
+        html += `
+            <hr>
+
+            <button onclick="replyLinLan()">
+                回复：“收到”
+            </button>
+        `;
+    }
     document.getElementById("content").innerHTML = html;
 }
 
@@ -308,6 +330,27 @@ function endDay() {
             返回首页
         </button>
     `;
+    if (save.day === 3) {
+
+        save.day++;
+
+        persist();
+
+        document.getElementById("content").innerHTML = `
+            <h2>系统同步中……</h2>
+
+            <p>
+            检测到日志冲突。<br><br>
+            请勿讨论不存在的信息。
+            </p>
+
+            <button onclick="showHome()">
+                返回首页
+            </button>
+        `;
+
+        return;
+    }
 }
 
 function resetSave() {
