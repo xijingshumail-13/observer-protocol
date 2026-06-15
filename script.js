@@ -24,6 +24,8 @@ function initializeSave() {
     save.flags = save.flags || {};
     save.realChoices = save.realChoices || {};
     save.chapterFinished = save.chapterFinished || false;
+    save.endingState = save.endingState || null;
+    save.truthRoute = save.truthRoute || false;
 }
 
 function replyLinLan() {
@@ -122,7 +124,6 @@ async function showHome() {
         showEnding();
         return;
     }
-
     const eventResponse = await fetch("data/events.json");
     const events = await eventResponse.json();
 
@@ -140,7 +141,24 @@ async function showHome() {
         checkCondition(mail.condition) &&
         !save.readMails.includes(mail.title)
     ).length;
+if (save.day >= 7 && !save.flags.identityChecked) {
 
+    document.getElementById("content").innerHTML = `
+        <h2>系统验证</h2>
+
+        <p>请确认你的身份：</p>
+
+        <button onclick="confirmIdentity(true)">
+            我是观测员 ${save.employeeId}
+        </button>
+
+        <button onclick="confirmIdentity(false)">
+            我不知道
+        </button>
+    `;
+
+    return;
+}
     document.getElementById("content").innerHTML = `
         <h2>欢迎回来，观测员 ${save.employeeId}</h2>
 
@@ -247,7 +265,12 @@ function choose(eventId, choice) {
 
     openArchive();
     if (eventId === "E-000") {
-        save.flags.finalChoice = choice;
+
+        save.endingState = choice;
+
+        if (choice === "拒绝删除") {
+            save.truthRoute = true;
+        }
     }
 }
 
@@ -551,6 +574,9 @@ async function endDay() {
             返回首页
         </button>
     `;
+    if (save.day >= 9 && !save.endingState) {
+        save.endingState = "未确认";
+    }
 }
 function resetSave() {
 
@@ -586,47 +612,65 @@ function questionLinLan() {
 }
 function showEnding() {
 
-    let endingTitle = "";
-    let endingText = "";
+    let ending = "";
 
-    switch (save.flags.finalChoice) {
+    // 1. 认同系统版本
+    if (save.endingState === "批准删除") {
 
-        case "批准删除":
-            endingTitle = "END 01：稳定";
-            endingText =
-                "观测对象已完成处理。\n\n系统恢复正常。\n\n感谢您的配合。";
-            break;
+        ending = {
+            title: "END 01：稳定协议",
+            text: "系统已恢复。\n你完成了所有删除操作。"
+        };
+    }
 
-        case "拒绝删除":
-            endingTitle = "END 02：观测者";
-            endingText =
-                "处理申请被驳回。\n\n请继续工作。\n\n欢迎回来，观测员" +
-                save.employeeId +
-                "。";
-            break;
+    // 2. 反抗系统版本
+    else if (save.endingState === "拒绝删除") {
 
-        case "上报异常":
-            endingTitle = "END 03：循环";
-            endingText =
-                "异常已提交。\n\n等待上级审核……\n\n当前工作日：Day 1";
-            break;
+        ending = {
+            title: "END 02：观测者残留",
+            text: "你拒绝了删除。\n系统开始重新标记你。"
+        };
+    }
+
+    // 3. 上报异常（循环结局）
+    else if (save.endingState === "上报异常") {
+
+        ending = {
+            title: "END 03：循环协议",
+            text: "上级正在接管。\n你回到了Day 1。"
+        };
+    }
+
+    // 4. 没有选择（关键补丁）
+    else {
+
+        ending = {
+            title: "END 00：未确认",
+            text: "你没有做出最终判断。\n系统无法解析你的状态。"
+        };
     }
 
     document.getElementById("content").innerHTML = `
-        <h2>${endingTitle}</h2>
+        <h2>${ending.title}</h2>
 
         <p style="white-space: pre-line;">
-            ${endingText}
+            ${ending.text}
         </p>
 
         <hr>
 
-        <button onclick="openLog()">
-            查看系统日志
-        </button>
-
         <button onclick="resetSave()">
-            返回登录界面
+            重新开始
         </button>
     `;
+}
+function confirmIdentity(valid) {
+
+    save.flags.identityChecked = true;
+
+    save.flags.identityValid = valid;
+
+    persist();
+
+    showHome();
 }
