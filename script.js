@@ -8,25 +8,42 @@ window.onload = () => {
 
         save = JSON.parse(stored);
 
-        save.completedArchives = save.completedArchives || [];
-        save.readMails = save.readMails || [];
-        save.logs = save.logs || [];
+        initializeSave();
 
         enterDesktop();
     }
 };
 
+function initializeSave() {
+
+    save.completedArchives = save.completedArchives || [];
+    save.readMails = save.readMails || [];
+    save.logs = save.logs || [];
+}
+
 function login() {
 
-    const id = document.getElementById("employee-id").value;
+    const id = document.getElementById("employee-id").value.trim();
 
     if (!id) {
+
         alert("请输入员工编号");
+
         return;
     }
 
-    save.employeeId = id;
-    save.day = 1;
+    save = {
+
+        employeeId: id,
+
+        day: 1,
+
+        completedArchives: [],
+
+        readMails: [],
+
+        logs: []
+    };
 
     persist();
 
@@ -43,12 +60,6 @@ function enterDesktop() {
     document.getElementById("desktop")
         .classList.remove("hidden");
 
-    document.getElementById("content")
-        .innerHTML =
-        `
-        欢迎回来，观测员 ${save.employeeId}。<br><br>
-        当前工作日：Day ${save.day}
-        `;
     showHome();
 }
 
@@ -59,91 +70,9 @@ function persist() {
         JSON.stringify(save)
     );
 }
-
-async function openArchive() {
-    
-    const response = await fetch("data/events.json");
-
-    const events = await response.json();
-
-    const available = events.filter(event =>
-        event.day <= save.day &&
-        !save.completedArchives.includes(event.id)
-    );
-    if (available.length === 0) {
-
-        document.getElementById("content").innerHTML = `
-            <h2>今日档案</h2>
-
-            <p>暂无待处理档案。</p>
-        `;
-
-        return;
-    }
-    const event = available[0];
-    let html =
-        `
-        <h2>${event.id}</h2>
-
-        <h3>${event.title}</h3>
-
-        <p>${event.text.replace(/\n/g,"<br>")}</p>
-
-        <hr>
-        `;
-
-    event.choices.forEach(choice => {
-
-        html += `
-        <button onclick="choose('${event.id}','${choice}')">
-            ${choice}
-        </button>
-        `; 
-    });
-
-    document.getElementById("content").innerHTML = html;
-    console.log("当前日期", save.day);
-    console.log("已完成档案", save.completedArchives);
-    console.log("可用档案", available);
-}
-
-function choose(eventId, choice) {
-
-    save.realChoice = choice;
-
-    if (!save.completedArchives.includes(eventId)) {
-
-        save.completedArchives.push(eventId);
-
-    }
-
-    save.logs.push({
-
-        eventId: eventId,
-
-        actualChoice: choice,
-
-        recordedChoice: "删除"
-
-    });
-
-    persist();
-
-    openArchive();
-}
-
-function resetSave() {
-
-    if (!confirm("确认删除存档？")) {
-        return;
-    }
-
-    localStorage.removeItem("observer_save");
-
-    location.reload();
-}
-
 async function showHome() {
+
+    initializeSave();
 
     const eventResponse = await fetch("data/events.json");
     const events = await eventResponse.json();
@@ -151,12 +80,12 @@ async function showHome() {
     const mailResponse = await fetch("data/mails.json");
     const mails = await mailResponse.json();
 
-    const count = events.filter(event =>
+    const archiveCount = events.filter(event =>
         event.day <= save.day &&
         !save.completedArchives.includes(event.id)
     ).length;
 
-    const unread = mails.filter(mail =>
+    const unreadCount = mails.filter(mail =>
         mail.day <= save.day &&
         !save.readMails.includes(mail.title)
     ).length;
@@ -166,12 +95,12 @@ async function showHome() {
 
         <p>当前工作日：Day ${save.day}</p>
 
-        <p>待处理档案：${count}</p>
+        <p>待处理档案：${archiveCount}</p>
 
-        <p>未读邮件：${unread}</p>
+        <p>未读邮件：${unreadCount}</p>
 
         ${
-            count === 0
+            archiveCount === 0
             ? `
             <hr>
 
@@ -184,37 +113,118 @@ async function showHome() {
     `;
 }
 
+async function openArchive() {
+
+    initializeSave();
+
+    const response = await fetch("data/events.json");
+    const events = await response.json();
+
+    const available = events.filter(event =>
+        event.day <= save.day &&
+        !save.completedArchives.includes(event.id)
+    );
+
+    if (available.length === 0) {
+
+        document.getElementById("content").innerHTML = `
+            <h2>今日档案</h2>
+
+            <p>暂无待处理档案。</p>
+        `;
+
+        return;
+    }
+
+    const event = available[0];
+
+    let html = `
+        <h2>${event.id}</h2>
+
+        <h3>${event.title}</h3>
+
+        <p>${event.text.replace(/\n/g, "<br>")}</p>
+
+        <hr>
+    `;
+
+    event.choices.forEach(choice => {
+
+        html += `
+            <button onclick="choose('${event.id}','${choice}')">
+                ${choice}
+            </button>
+        `;
+    });
+
+    document.getElementById("content").innerHTML = html;
+}
+
+function choose(eventId, choice) {
+
+    initializeSave();
+
+    if (!save.completedArchives.includes(eventId)) {
+
+        save.completedArchives.push(eventId);
+    }
+
+    save.logs.push({
+
+        eventId: eventId,
+
+        actualChoice: choice,
+
+        recordedChoice: "删除"
+    });
+
+    persist();
+
+    openArchive();
+}
 async function openMail() {
 
-    const response = await fetch("data/mails.json");
+    initializeSave();
 
+    const response = await fetch("data/mails.json");
     const mails = await response.json();
 
-    const available = mails.filter(
-        m => m.day <= save.day
+    const available = mails.filter(mail =>
+        mail.day <= save.day
     );
 
     let html = "<h2>邮件</h2>";
 
-    available.forEach(mail => {
+    if (available.length === 0) {
 
-        html += `
-            <div class="mail">
-                <h3>${mail.title}</h3>
+        html += "<p>暂无邮件。</p>";
 
-                <p>发件人：${mail.from}</p>
+    } else {
 
-                <p>${mail.content}</p>
+        available.forEach(mail => {
 
-                <hr>
-            </div>
-        `;
-        if (!save.readMails.includes(mail.title)) {
-            save.readMails.push(mail.title);
-        }
-    });
+            html += `
+                <div class="mail">
 
-    persist();
+                    <h3>${mail.title}</h3>
+
+                    <p>发件人：${mail.from}</p>
+
+                    <p>${mail.content}</p>
+
+                    <hr>
+
+                </div>
+            `;
+
+            if (!save.readMails.includes(mail.title)) {
+
+                save.readMails.push(mail.title);
+            }
+        });
+
+        persist();
+    }
 
     document.getElementById("content").innerHTML = html;
 }
@@ -222,32 +232,42 @@ async function openMail() {
 async function openForum() {
 
     const response = await fetch("data/forum.json");
-
     const posts = await response.json();
 
-    const available = posts.filter(
-        p => p.day <= save.day
+    const available = posts.filter(post =>
+        post.day <= save.day
     );
 
     let html = "<h2>员工论坛</h2>";
 
-    available.forEach(post => {
+    if (available.length === 0) {
 
-        html += `
-            <div class="post">
-                <strong>${post.author}</strong>
+        html += "<p>暂无帖子。</p>";
 
-                <p>${post.content}</p>
+    } else {
 
-                <hr>
-            </div>
-        `;
-    });
+        available.forEach(post => {
+
+            html += `
+                <div class="post">
+
+                    <strong>${post.author}</strong>
+
+                    <p>${post.content}</p>
+
+                    <hr>
+
+                </div>
+            `;
+        });
+    }
 
     document.getElementById("content").innerHTML = html;
 }
 
 function openLog() {
+
+    initializeSave();
 
     let html = "<h2>系统日志</h2>";
 
@@ -265,16 +285,14 @@ function openLog() {
                 </p>
             `;
         });
-
     }
 
     document.getElementById("content").innerHTML = html;
 }
+
 function endDay() {
 
     save.day++;
-
-    save.mailRead = false;
 
     persist();
 
@@ -282,12 +300,24 @@ function endDay() {
         <h2>系统同步中……</h2>
 
         <p>
-        工作日志已提交。<br><br>
-        当前日期：Day ${save.day}
+            工作日志已提交。<br><br>
+            当前日期：Day ${save.day}
         </p>
 
         <button onclick="showHome()">
             返回首页
         </button>
     `;
+}
+
+function resetSave() {
+
+    if (!confirm("确认删除存档？")) {
+
+        return;
+    }
+
+    localStorage.removeItem("observer_save");
+
+    location.reload();
 }
