@@ -128,6 +128,23 @@
         "day": 7,
         "condition": "questionedLinLan",
         "title": "Observer Protocol",
-        "text": "当系统出现身份冲突时，请遵循以下规则：\n\n1. 不要回应与你工号一致的人员。\n2. 不要承认自己存在记忆错误。\n3. 若收到本协议，请假定发送者不是系统。\n\n——Observer Protocol"
+        "text": "当系统出现身份冲突时，请遵循以下规则：\n\n1. 不要回应与你工号一致的人员。\n2. 不要承认自己存在记忆错误。\n3. 若收到本协议，请假定发送者不是系统。\n\n——Observer Protocol",
+        "choices": [
+            "遵循协议",
+            "质疑协议",
+            "删除协议"
+        ]
+    },
+    {
+        "id": "E-000",
+        "day": 8,
+        "condition": "questionedLinLan",
+        "title": "观测对象",
+        "text": "观测对象编号：{employeeId}\n\n异常表现：持续认为自己正在执行观测任务。\n\n备注：该对象会将自身视为工作人员，并尝试修正系统异常。\n\n处理建议：删除。",
+        "choices": [
+            "批准删除",
+            "拒绝删除",
+            "上报异常"
+        ]
     }
 ]

@@ -54,5 +54,19 @@
         "from": "身份认证中心",
         "title": "验证成功通知",
         "content": "您的身份验证已通过。"
+    },
+    {
+        "day": 8,
+        "condition": "questionedLinLan",
+        "from": "系统",
+        "title": "自动回复",
+        "content": "若您收到本邮件，请忽略此前所有身份验证结果。"
+    },
+    {
+        "day": 8,
+        "condition": "questionedLinLan",
+        "from": "林岚",
+        "title": "最后的留言",
+        "content": "如果他们让你确认自己是谁，不要急着回答。"
     }
 ]

@@ -237,6 +237,9 @@ function choose(eventId, choice) {
     persist();
 
     openArchive();
+    if (eventId === "E-000") {
+        save.flags.finalChoice = choice;
+    }
 }
 
 async function openMail() {
@@ -406,7 +409,20 @@ function openLog() {
             `;
         });
     }
+    if (save.flags.finalChoice) {
 
+        html += `
+            <hr>
+
+            <p>
+                E-000：删除
+            </p>
+
+            <p>
+                实际处理结果：${save.flags.finalChoice}
+            </p>
+        `;
+    }
     document.getElementById("content").innerHTML = html;
 }
 
@@ -496,6 +512,16 @@ async function endDay() {
         return;
     }
 
+        if (
+            save.day === 9 &&
+            save.flags.finalChoice
+        ) {
+
+            showEnding();
+
+            return;
+        }
+
     /* 普通结算 */
     document.getElementById("content").innerHTML = `
         <h2>系统同步中……</h2>
@@ -541,4 +567,50 @@ function questionLinLan() {
     persist();
 
     openForum();
+}
+function showEnding() {
+
+    let endingTitle = "";
+    let endingText = "";
+
+    switch (save.flags.finalChoice) {
+
+        case "批准删除":
+            endingTitle = "END 01：稳定";
+            endingText =
+                "观测对象已完成处理。\n\n系统恢复正常。\n\n感谢您的配合。";
+            break;
+
+        case "拒绝删除":
+            endingTitle = "END 02：观测者";
+            endingText =
+                "处理申请被驳回。\n\n请继续工作。\n\n欢迎回来，观测员" +
+                save.employeeId +
+                "。";
+            break;
+
+        case "上报异常":
+            endingTitle = "END 03：循环";
+            endingText =
+                "异常已提交。\n\n等待上级审核……\n\n当前工作日：Day 1";
+            break;
+    }
+
+    document.getElementById("content").innerHTML = `
+        <h2>${endingTitle}</h2>
+
+        <p style="white-space: pre-line;">
+            ${endingText}
+        </p>
+
+        <hr>
+
+        <button onclick="openLog()">
+            查看系统日志
+        </button>
+
+        <button onclick="resetSave()">
+            返回登录界面
+        </button>
+    `;
 }

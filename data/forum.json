@@ -94,5 +94,17 @@
         "condition": "deniedFakePost",
         "author": "林岚",
         "content": "{employeeId}，如果你还能看见，请不要相信身份验证结果。"
+    },
+        {
+        "day": 8,
+        "condition": "questionedLinLan",
+        "author": "匿名",
+        "content": "今天怎么没人发帖？"
+    },
+    {
+        "day": 8,
+        "condition": "questionedLinLan",
+        "author": "系统",
+        "content": "员工论坛维护中。"
     }
 ]
