@@ -400,7 +400,9 @@ async function endDay() {
             !save.completedArchives.includes(event.id) &&
             checkCondition(event.condition)
         );
-
+        console.log("当前Day:", save.day);
+        console.log("已完成:", save.completedArchives);
+        console.log("剩余档案:", remaining);
         if (remaining.length > 0) {
 
             document.getElementById("content").innerHTML = `
