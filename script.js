@@ -10,6 +10,7 @@ window.onload = () => {
     }
 
     save.completedArchives = save.completedArchives || [];
+    save.readMails = save.readMails || [];
 
     showHome();
 };
@@ -155,7 +156,16 @@ function showHome() {
 
         <p>待处理档案：${count}</p>
 
-        <p>未读邮件：${save.mailRead ? 0 : 1}</p>
+        const unread = mails.filter(mail =>
+        mail.day <= save.day &&
+        !(save.readMails || []).includes(mail.title)
+        ).length;
+        ${count === 0 ? `
+        <hr>
+        <button onclick="endDay()">
+        结束工作日
+        </button>
+        ` : ""}
     `;
 });
 }
@@ -184,9 +194,10 @@ async function openMail() {
                 <hr>
             </div>
         `;
+        if (!save.readMails.includes(mail.title)) {
+            save.readMails.push(mail.title);
+        }
     });
-
-    save.mailRead = true;
 
     persist();
 
@@ -228,5 +239,26 @@ function openLog() {
         E-023：
         ${save.systemLog || "无记录"}
         </p>
+    `;
+}
+function endDay() {
+
+    save.day++;
+
+    save.mailRead = false;
+
+    persist();
+
+    document.getElementById("content").innerHTML = `
+        <h2>系统同步中……</h2>
+
+        <p>
+        工作日志已提交。<br><br>
+        当前日期：Day ${save.day}
+        </p>
+
+        <button onclick="showHome()">
+            返回首页
+        </button>
     `;
 }
