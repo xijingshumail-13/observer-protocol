@@ -354,6 +354,27 @@ function endDay() {
 
     persist();
 
+    if (
+        save.day === 4 &&
+        save.flags.repliedLinLan
+    ) {
+
+        document.getElementById("content").innerHTML = `
+            <h2>系统同步中……</h2>
+
+            <p>
+                检测到未授权信息交换。<br><br>
+                请勿讨论不存在的信息。
+            </p>
+
+            <button onclick="showHome()">
+                返回首页
+            </button>
+        `;
+
+        return;
+    }
+
     document.getElementById("content").innerHTML = `
         <h2>系统同步中……</h2>
 
@@ -366,27 +387,6 @@ function endDay() {
             返回首页
         </button>
     `;
-    if (save.day === 3) {
-
-        save.day++;
-
-        persist();
-
-        document.getElementById("content").innerHTML = `
-            <h2>系统同步中……</h2>
-
-            <p>
-            检测到日志冲突。<br><br>
-            请勿讨论不存在的信息。
-            </p>
-
-            <button onclick="showHome()">
-                返回首页
-            </button>
-        `;
-
-        return;
-    }
 }
 
 function resetSave() {
