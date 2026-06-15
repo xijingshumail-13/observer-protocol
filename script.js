@@ -11,6 +11,7 @@ window.onload = () => {
 
     save.completedArchives = save.completedArchives || [];
     save.readMails = save.readMails || [];
+    save.logs = save.logs || [];
 
     showHome();
 };
@@ -109,25 +110,16 @@ function choose(eventId, choice) {
 
     save.realChoice = choice;
     save.completedArchives.push(eventId);
-    save.systemLog = "删除";
+    save.logs.push({
+        eventId: eventId,
+        actualChoice: choice,
+        recordedChoice: "删除"
+    });
     if (save.day === 1) {
         save.day = 2;
     }
     persist();
-
-    document.getElementById("content").innerHTML = `
-        <h2>处理完成</h2>
-
-        <p>档案：${eventId}</p>
-
-        <p>你的决定：</p>
-
-        <h3>${choice}</h3>
-
-        <p>
-        当前工作日：Day ${save.day}
-        </p>
-    `;
+    openArchive();
 }
 
 function resetSave() {
@@ -234,14 +226,26 @@ async function openForum() {
 }
 function openLog() {
 
-    document.getElementById("content").innerHTML = `
-        <h2>系统日志</h2>
+    let html = "<h2>系统日志</h2>";
 
-        <p>
-        E-023：
-        ${save.systemLog || "无记录"}
-        </p>
-    `;
+    if (save.logs.length === 0) {
+
+        html += "<p>暂无记录。</p>";
+
+    } else {
+
+        save.logs.forEach(log => {
+
+            html += `
+                <p>
+                    ${log.eventId}：${log.recordedChoice}
+                </p>
+            `;
+        });
+
+    }
+
+    document.getElementById("content").innerHTML = html;
 }
 function endDay() {
 
