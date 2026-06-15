@@ -335,6 +335,35 @@ async function openForum() {
         `;
     }
     document.getElementById("content").innerHTML = html;
+    if (
+        save.day === 5 &&
+        save.flags.repliedLinLan &&
+        !save.flags.deniedFakePost
+    ) {
+
+        html += `
+            <hr>
+
+            <button onclick="denyFakePost()">
+                回复：“这不是我发的。”
+            </button>
+        `;
+    }
+}
+
+function denyFakePost() {
+
+    save.flags.deniedFakePost = true;
+
+    save.forumReplies.push({
+        day: save.day,
+        author: save.employeeId,
+        content: "这不是我发的。"
+    });
+
+    persist();
+
+    openForum();
 }
 
 function openLog() {
@@ -402,6 +431,26 @@ async function endDay() {
             返回首页
         </button>
     `;
+    if (
+        save.day === 6 &&
+        save.flags.deniedFakePost
+    ) {
+
+        document.getElementById("content").innerHTML = `
+            <h2>系统同步中……</h2>
+
+            <p>
+                检测到身份冲突。<br><br>
+                请确认当前登录者身份。
+            </p>
+
+            <button onclick="showHome()">
+                返回首页
+            </button>
+        `;
+
+        return;
+    }
 }
 
 function resetSave() {
