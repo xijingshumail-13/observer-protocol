@@ -30,27 +30,27 @@
         "content": "楼上说什么？我刷新之后只看到系统提示。"
     },
     {
-        "day": 4,
-        "condition": "repliedLinLan",
-        "author": "林岚",
-        "content": "昨天回复我的人，你还在吗？"
+        "day":4,
+        "condition":"repliedLinLan",
+        "author":"林岚",
+        "content":"{employeeId}，你还在吗？"
     },
     {
-    "day": 4,
-    "condition": "!repliedLinLan",
-    "author": "匿名",
-    "content": "昨天那个帖子是不是有人回复过？"
+        "day":4,
+        "condition":"!repliedLinLan",
+        "author":"匿名",
+        "content":"昨天那个帖子后来怎么样了？"
     },
     {
-        "day": 4,
-        "condition": "!repliedLinLan",
-        "author": "匿名",
-        "content": "我记得看到一个“收到”。"
+        "day":4,
+        "condition":"!repliedLinLan",
+        "author":"匿名",
+        "content":"我记得好像有人回复过。"
     },
     {
-        "day": 4,
-        "condition": "!repliedLinLan",
-        "author": "匿名",
-        "content": "……还是我记错了？"
+        "day":4,
+        "condition":"!repliedLinLan",
+        "author":"匿名",
+        "content":"……还是我记错了？"
     }
 ]

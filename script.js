@@ -89,6 +89,16 @@ function persist() {
     );
 }
 
+function renderText(text) {
+
+    if (!text) {
+        return "";
+    }
+
+    return text
+        .replace(/\{employeeId\}/g, save.employeeId);
+}
+
 function checkCondition(condition) {
 
     initializeSave();
@@ -178,9 +188,9 @@ async function openArchive() {
     let html = `
         <h2>${event.id}</h2>
 
-        <h3>${event.title}</h3>
+        <h3>${renderText(event.title)}</h3>
 
-        <p>${event.text.replace(/\n/g, "<br>")}</p>
+        <p>${renderText(event.text).replace(/\n/g, "<br>")}</p>
 
         <hr>
     `;
@@ -245,11 +255,11 @@ async function openMail() {
             html += `
                 <div class="mail">
 
-                    <h3>${mail.title}</h3>
+                    <h3>${renderText(mail.title)}</h3>
 
                     <p>发件人：${mail.from}</p>
 
-                    <p>${mail.content}</p>
+                    <p>${renderText(mail.content)}</p>
 
                     <hr>
 
@@ -300,9 +310,9 @@ async function openForum() {
             html += `
                 <div class="post">
 
-                    <strong>${post.author}</strong>
+                    <strong>${renderText(post.author)}</strong>
 
-                    <p>${post.content}</p>
+                    <p>${renderText(post.content)}</p>
 
                     <hr>
 
