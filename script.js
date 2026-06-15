@@ -392,47 +392,48 @@ function openLog() {
 }
 
 async function endDay() {
+
+    initializeSave();
+
     const response = await fetch("data/events.json");
-        const events = await response.json();
+    const events = await response.json();
 
-        const remaining = events.filter(event =>
-            event.day <= save.day &&
-            !save.completedArchives.includes(event.id) &&
-            checkCondition(event.condition)
-        );
-        console.log("当前Day:", save.day);
-        console.log("已完成:", save.completedArchives);
-        console.log("剩余档案:", remaining);
-        if (remaining.length > 0) {
+    const remaining = events.filter(event =>
+        event.day === save.day &&
+        !save.completedArchives.includes(event.id) &&
+        checkCondition(event.condition)
+    );
 
-            document.getElementById("content").innerHTML = `
-                <h2>系统提示</h2>
+    console.log("当前Day:", save.day);
+    console.log("已完成:", save.completedArchives);
+    console.log("剩余档案:", remaining);
 
-                <p>
-                    尚有 ${remaining.length} 份档案待处理。<br><br>
-                    请完成全部工作后再提交日志。
-                </p>
+    if (remaining.length > 0) {
 
-                <button onclick="openArchive()">
-                    前往处理
-                </button>
-            `;
+        document.getElementById("content").innerHTML = `
+            <h2>系统提示</h2>
 
-            return;
-        }
+            <p>
+                尚有 ${remaining.length} 份档案待处理。<br><br>
+                请完成全部工作后再提交日志。
+            </p>
 
-    document.getElementById("content").innerHTML = `
-        <h2>系统同步中……</h2>
+            <button onclick="openArchive()">
+                前往处理
+            </button>
+        `;
 
-        <p>
-            工作日志已提交。<br><br>
-            当前日期：Day ${save.day}
-        </p>
+        return;
+    }
 
-        <button onclick="showHome()">
-            返回首页
-        </button>
-    `;
+    /* 真正推进日期 */
+    save.day++;
+
+    persist();
+
+    console.log("推进后Day:", save.day);
+
+    /* Day5结束进入Day6时的特殊结算 */
     if (
         save.day === 6 &&
         save.flags.deniedFakePost
@@ -453,16 +454,40 @@ async function endDay() {
 
         return;
     }
-}
 
-function resetSave() {
+    /* Day3结束后的特殊警告 */
+    if (
+        save.day === 4 &&
+        save.flags.repliedLinLan
+    ) {
 
-    if (!confirm("确认删除存档？")) {
+        document.getElementById("content").innerHTML = `
+            <h2>系统同步中……</h2>
+
+            <p>
+                检测到未授权信息交换。<br><br>
+                请勿讨论不存在的信息。
+            </p>
+
+            <button onclick="showHome()">
+                返回首页
+            </button>
+        `;
 
         return;
     }
 
-    localStorage.removeItem("observer_save");
+    /* 普通结算 */
+    document.getElementById("content").innerHTML = `
+        <h2>系统同步中……</h2>
 
-    location.reload();
+        <p>
+            工作日志已提交。<br><br>
+            当前日期：Day ${save.day}
+        </p>
+
+        <button onclick="showHome()">
+            返回首页
+        </button>
+    `;
 }
