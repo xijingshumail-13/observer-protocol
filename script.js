@@ -88,6 +88,22 @@ function persist() {
         JSON.stringify(save)
     );
 }
+
+function checkCondition(condition) {
+
+    initializeSave();
+
+    if (!condition) {
+        return true;
+    }
+
+    if (condition.startsWith("!")) {
+        return !save.flags[condition.slice(1)];
+    }
+
+    return !!save.flags[condition];
+}
+
 async function showHome() {
 
     initializeSave();
@@ -100,11 +116,13 @@ async function showHome() {
 
     const archiveCount = events.filter(event =>
         event.day <= save.day &&
-        !save.completedArchives.includes(event.id)
+        !save.completedArchives.includes(event.id) &&
+        checkCondition(event.condition)
     ).length;
 
     const unreadCount = mails.filter(mail =>
         mail.day <= save.day &&
+        checkCondition(mail.condition) &&
         !save.readMails.includes(mail.title)
     ).length;
 
@@ -140,7 +158,8 @@ async function openArchive() {
 
     const available = events.filter(event =>
         event.day <= save.day &&
-        !save.completedArchives.includes(event.id)
+        !save.completedArchives.includes(event.id) &&
+        checkCondition(event.condition)
     );
 
     if (available.length === 0) {
@@ -200,6 +219,7 @@ function choose(eventId, choice) {
 
     openArchive();
 }
+
 async function openMail() {
 
     initializeSave();
@@ -208,7 +228,8 @@ async function openMail() {
     const mails = await response.json();
 
     const available = mails.filter(mail =>
-        mail.day <= save.day
+        mail.day <= save.day &&
+        checkCondition(mail.condition)
     );
 
     let html = "<h2>邮件</h2>";
@@ -252,8 +273,9 @@ async function openForum() {
     const response = await fetch("data/forum.json");
     const posts = await response.json();
 
-    const systemPosts = posts.filter(
-        post => post.day <= save.day
+    const systemPosts = posts.filter(post =>
+        post.day <= save.day &&
+        checkCondition(post.condition)
     );
 
     const playerPosts = save.forumReplies.filter(
@@ -288,7 +310,7 @@ async function openForum() {
             `;
         });
     }
-    if (save.day >= 3 && !save.repliedToLinLan) {
+    if (save.day === 3 &&!save.flags.repliedLinLan) {
 
         html += `
             <hr>
