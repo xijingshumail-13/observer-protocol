@@ -4,12 +4,14 @@ window.onload = () => {
 
     const stored = localStorage.getItem("observer_save");
 
-    if (stored) {
-
+    if (stored) 
+    {
         save = JSON.parse(stored);
-
-        enterDesktop();
     }
+
+    save.completedArchives = save.completedArchives || [];
+
+    enterDesktop();
 };
 
 function login() {
@@ -62,8 +64,21 @@ async function openArchive() {
 
     const events = await response.json();
 
-    const event = events[0];
+    const available = events.filter(event =>
+        event.day <= save.day &&
+        !save.completedArchives.includes(event.id)
+    );
+    if (available.length === 0) {
 
+        document.getElementById("content").innerHTML = `
+            <h2>今日档案</h2>
+
+            <p>暂无待处理档案。</p>
+        `;
+
+        return;
+    }
+    const event = available[0];
     let html =
         `
         <h2>${event.id}</h2>
@@ -77,35 +92,38 @@ async function openArchive() {
 
     event.choices.forEach(choice => {
 
-        html +=
-        `
-        <button onclick="choose('${choice}')">
+        html += `
+        <button onclick="choose('${event.id}','${choice}')">
             ${choice}
         </button>
-        `;
+        `; 
     });
 
     document.getElementById("content").innerHTML = html;
 }
 
-function choose(choice) {
+function choose(eventId, choice) {
 
     save.realChoice = choice;
-    save.day = 2;
+    save.completedArchives.push(eventId);
     save.systemLog = "删除";
-
+    if (save.day === 1) {
+        save.day = 2;
+    }
     persist();
 
-    document.getElementById("content").innerHTML =
-    `
-    <p>已记录决定：</p>
+    document.getElementById("content").innerHTML = `
+        <h2>处理完成</h2>
 
-    <h3>${choice}</h3>
+        <p>档案：${eventId}</p>
 
-    <p>
-    系统已更新。<br><br>
-    当前工作日：Day ${save.day}
-    </p>
+        <p>你的决定：</p>
+
+        <h3>${choice}</h3>
+
+        <p>
+        当前工作日：Day ${save.day}
+        </p>
     `;
 }
 
@@ -121,15 +139,25 @@ function resetSave() {
 }
 function showHome() {
 
+    fetch("data/events.json")
+    .then(r => r.json())
+    .then(events => {
+
+        const count = events.filter(event =>
+            event.day <= save.day &&
+            !save.completedArchives.includes(event.id)
+        ).length;
+
     document.getElementById("content").innerHTML = `
         <h2>欢迎回来，观测员 ${save.employeeId}</h2>
 
         <p>当前工作日：Day ${save.day}</p>
 
-        <p>待处理档案：1</p>
+        <p>待处理档案：${count}</p>
 
         <p>未读邮件：${save.mailRead ? 0 : 1}</p>
     `;
+});
 }
 async function openMail() {
 
